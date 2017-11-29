@@ -1,0 +1,25 @@
+version: "2.1"
+
+services:
+
+  syslog:
+    image: deployable/rsyslog
+    ports:
+      - '1514:1514/udp'
+      - '1514:1514/tcp'
+
+  mongo:
+    image: mongo
+    command: mongod -v
+    volumes:
+      - 'mongo_data:/data/db'
+    depends_on:
+      - syslog
+    logging:
+      options:
+        tag: '{{.FullID}} {{.Name}}'
+        syslog-address: "tcp://10.8.8.8:1514"
+      driver: syslog
+
+volumes:
+  mongo_data:
